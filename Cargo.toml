@@ -1,0 +1,23 @@
+[package]
+name = "lure"
+version = "0.1.0"
+edition = "2024"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+# The versions of ciborium and serde are the same as Typst 0.13.
+ciborium = "0.2.1"
+serde = "1.0"
+thiserror = "2.0.12"
+url = "2.5.4"
+wasm-minimal-protocol = "0.1.0"
+
+
+[profile.release]
+lto = true          # Enable link-time optimization
+strip = true        # Strip symbols from binary*
+opt-level = 'z'     # Optimize for size
+codegen-units = 1   # Reduce number of codegen units to increase optimizations
+panic = 'abort'     # Abort on panic
