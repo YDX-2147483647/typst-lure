@@ -54,14 +54,14 @@ Unlike [percencode](https://typst.app/universe/package/percencode), this package
 
 // Parse into components
 #assert.eq(
-  parse("ssh://git@github.com/YDX-2147483647/typst-lure.git"),
+  parse("ssh://git@ssh.github.com:443/YDX-2147483647/typst-lure.git"),
   (
     scheme: "ssh",
     cannot-be-a-base: false,
     username: "git",
     password: none,
-    host: "github.com",
-    port: none,
+    host: "ssh.github.com",
+    port: 443,
     path: "/YDX-2147483647/typst-lure.git",
     query: none,
     fragment: none,
