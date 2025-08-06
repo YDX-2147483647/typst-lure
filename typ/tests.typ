@@ -20,9 +20,7 @@
 /// ```
 #let test-doc-examples() = {
   let file = "lure.typ"
-
-  // Extracting doc examples is fragile, so keep a human count
-  let human-count = 3
+  let file-content = read(file)
 
   // Extract `doc-examples`
   //
@@ -33,7 +31,7 @@
   //   - `array<str>`: lines of the focused example
   // - *`examples`*
   //   `array<str>`, parsed examples
-  let doc-examples = read(file)
+  let doc-examples = file-content
     .split(regex("\r?\n"))
     .fold(
       (
@@ -68,7 +66,11 @@
     .examples
 
   assert(doc-examples.len() > 0, message: "failed to find any doc examples")
-  assert.eq(doc-examples.len(), human-count)
+  assert.eq(
+    doc-examples.len(),
+    file-content.matches("#example").len(),
+    message: "doc-example parsing might be erroneous; please check manually",
+  )
 
   // Execute `doc-examples`
   for example in doc-examples {
