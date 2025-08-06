@@ -21,14 +21,18 @@ jobs:
       - uses: dtolnay/rust-toolchain@stable
       - run: just setup
       - uses: Swatinem/rust-cache@v2
-      
+
       - run: just build
+      - uses: actions/upload-artifact@v4
+        with:
+          name: lure-wasm
+          path: typ/lure.wasm
 
       - run: just test
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: test-refs
-          path: typ/refs  
+          path: typ/refs
 
       - run: just test-readme

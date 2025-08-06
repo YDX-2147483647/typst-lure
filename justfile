@@ -58,3 +58,7 @@ test-readme: (typship "dev") && (typship "clean")
         print("✅", end="")
     
     print("\nAll examples compiled successfully.")
+
+# Create package.7z for submission
+package:
+    7z a package.7z LICENSE README.md typst.toml typ/lib.typ typ/lure.typ typ/lure.wasm
