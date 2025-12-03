@@ -18,9 +18,19 @@
     .split(regex("\r?\n"))
 )
 
+#show: rest => context {
+  set page(height: auto) if target() == "paged"
+  rest
+}
+#let repr(value) = context if target() == "html" {
+  // This generates simpler HTML than `std.repr`.
+  html.pre(std.repr(value))
+} else {
+  // This ensures that it is keeped during paged export
+  par(std.repr(value))
+}
+
 #for u in urls {
   repr(parse(u))
   repr(parse-supplementary(u))
-
-  parbreak()
 }

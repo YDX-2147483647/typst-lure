@@ -7,7 +7,7 @@ edition = "2024"
 crate-type = ["cdylib"]
 
 [dependencies]
-# The versions of ciborium and serde are the same as Typst 0.13.
+# The versions of ciborium and serde are the same as Typst 0.14.
 ciborium = "0.2.1"
 serde = "1.0"
 thiserror = "2.0.12"
