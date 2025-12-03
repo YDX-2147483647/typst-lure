@@ -16,7 +16,10 @@ jobs:
       - uses: typst-community/setup-typst@v4
       - uses: taiki-e/install-action@v2
         with:
-          tool: just,tinymist,typship
+          tool: just,typship
+      - name: Setup tinymist
+        run:
+          curl --proto '=https' --tlsv1.2 -LsSf https://github.com/Myriad-Dreamin/tinymist/releases/latest/download/tinymist-installer.sh | sh
 
       - uses: dtolnay/rust-toolchain@stable
       - run: just setup
