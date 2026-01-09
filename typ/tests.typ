@@ -1,4 +1,6 @@
-#import "lib.typ": join, make-relative, normalize, parse, parse-supplementary
+#import "lib.typ": (
+  join, make-relative, normalize, parse, parse-supplementary, with-query-pairs,
+)
 
 // Import test files
 // https://myriad-dreamin.github.io/tinymist/feature/testing.html#label-Test%20Discovery
@@ -131,5 +133,47 @@
   assert.eq(
     make-relative("https://a.org", "https://b.org"),
     none,
+  )
+}
+
+#let test-with-query-pairs() = {
+  assert.eq(
+    with-query-pairs("https://example.com", none),
+    "https://example.com/",
+  )
+  assert.eq(
+    with-query-pairs("https://example.com", ()),
+    "https://example.com/?",
+  )
+
+  // Preserve order
+  assert.eq(
+    with-query-pairs("https://example.com", (a: "1", c: "2", b: "3")),
+    "https://example.com/?a=1&c=2&b=3",
+  )
+
+  // Duplicate keys
+  assert.eq(
+    with-query-pairs("https://example.com", (("a", "b"), ("a", "c"))),
+    "https://example.com/?a=b&a=c",
+  )
+
+  // Encoding
+  assert.eq(
+    with-query-pairs("https://validator.citationstyles.org", (
+      version: "1.0.2",
+      url: "https://typst-doc-cn.github.io/csl-sanitizer/chinese/src/GB-T-7714—2025（顺序编码，双语）/GB-T-7714—2025（顺序编码，双语）.csl",
+    )),
+    "https://validator.citationstyles.org/?version=1.0.2&url=https%3A%2F%2Ftypst-doc-cn.github.io%2Fcsl-sanitizer%2Fchinese%2Fsrc%2FGB-T-7714%E2%80%942025%EF%BC%88%E9%A1%BA%E5%BA%8F%E7%BC%96%E7%A0%81%EF%BC%8C%E5%8F%8C%E8%AF%AD%EF%BC%89%2FGB-T-7714%E2%80%942025%EF%BC%88%E9%A1%BA%E5%BA%8F%E7%BC%96%E7%A0%81%EF%BC%8C%E5%8F%8C%E8%AF%AD%EF%BC%89.csl",
+  )
+
+  // The syntax is not well defined…
+  assert.eq(
+    parse-supplementary("https://lib.rs?url").query-pairs,
+    (url: "").pairs(),
+  )
+  assert.eq(
+    with-query-pairs("https://lib.rs", (url: "")),
+    "https://lib.rs/?url=",
   )
 }

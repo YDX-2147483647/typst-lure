@@ -1,6 +1,6 @@
 use std::{borrow::Cow, str::Utf8Error};
 
-use ciborium::ser::into_writer;
+use ciborium::{from_reader, ser::into_writer};
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 use url::{self, ParseError, Url};
@@ -8,16 +8,21 @@ use wasm_minimal_protocol::{initiate_protocol, wasm_func};
 
 initiate_protocol!();
 
-#[derive(Error, Debug, PartialEq)]
+#[derive(Error, Debug)]
 pub enum TypstError {
-    #[error("failed parse bytes as UTF-8: {{ input: {input:?}, error: {error:?} }}")]
-    InputError { input: Vec<u8>, error: Utf8Error },
+    #[error("failed parse bytes as UTF-8 string: {{ input: {input:?}, error: {error:?} }}")]
+    InputStrError { input: Vec<u8>, error: Utf8Error },
+    #[error("failed parse bytes as query pairs: {{ input: {input:?}, error: {error:?} }}")]
+    InputQueryPairsError {
+        input: Vec<u8>,
+        error: ciborium::de::Error<std::io::Error>,
+    },
     #[error("failed to parse URL: {{ input: {input:?}, error: {error:?} }}")]
     ParseError { input: String, error: ParseError },
 }
 
 fn parse_str(input: &[u8]) -> Result<&str, TypstError> {
-    str::from_utf8(input).map_err(|error| TypstError::InputError {
+    str::from_utf8(input).map_err(|error| TypstError::InputStrError {
         input: input.to_vec(),
         error,
     })
@@ -132,4 +137,31 @@ pub fn make_relative(base: &[u8], url: &[u8]) -> Result<Vec<u8>, TypstError> {
     let mut out = Vec::new();
     into_writer(&relative, &mut out).unwrap();
     Ok(out)
+}
+
+#[derive(serde::Deserialize)]
+struct QueryPairs(Option<Vec<(String, String)>>);
+
+#[wasm_func]
+pub fn with_query_pairs(url: &[u8], query: &[u8]) -> Result<Vec<u8>, TypstError> {
+    let mut url = parse_url(url)?;
+    let query: QueryPairs = from_reader(query).map_err(|err| TypstError::InputQueryPairsError {
+        input: query.to_vec(),
+        error: err,
+    })?;
+
+    match query.0 {
+        Some(pairs) => {
+            let mut query_pairs = url.query_pairs_mut();
+            query_pairs.clear();
+            for (key, value) in pairs {
+                query_pairs.append_pair(&key, &value);
+            }
+        }
+        None => {
+            url.set_query(None);
+        }
+    }
+
+    Ok(url.as_str().as_bytes().to_vec())
 }

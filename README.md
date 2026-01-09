@@ -83,4 +83,42 @@ Unlike [percencode](https://typst.app/universe/package/percencode), this package
 )
 ```
 
-URLs can be tricky. Please refer to the documentation for detailed explanation of each field.
+URLs can be tricky. Please refer to the documentation (hover docs for typst functions, or [rust docs](https://docs.rs/url/latest/url/struct.Url.html)) for detailed explanation of each field.
+
+### Change query pairs
+
+```typst
+#import "@preview/lure:0.1.0": parse-supplementary, with-query-pairs
+
+// Add search parameters to a URL
+#assert.eq(
+  with-query-pairs("https://typst.app/universe/search/", (q: "url", openSource: "true")),
+  "https://typst.app/universe/search/?q=url&openSource=true",
+)
+
+// Modify existing query pairs
+#{
+  let url = "https://www.bilibili.com/video/BV1ys411472E/?vd_source=33a2db04ee4f097f3613aeb5caacc90b&spm_id_from=333.788.videopod.episodes&p=15"
+
+  let query = parse-supplementary(url).query-pairs
+  // Set time to 0:42
+  query += (t: str(42)).pairs()
+  // Remove trackings
+  query = query.filter(((key, _value)) => not ("vd_source", "spm_id_from").contains(key))
+
+  assert.eq(
+    with-query-pairs(url, query),
+    "https://www.bilibili.com/video/BV1ys411472E/?p=15&t=42",
+  )
+}
+```
+
+## Changelog
+
+### [unreleased]
+
+Add `with-query-pairs(url, query)` function.
+
+### 0.1.0
+
+Initial release with rust-url 2.5.4.

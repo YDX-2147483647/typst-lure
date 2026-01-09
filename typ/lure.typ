@@ -37,8 +37,7 @@
 ///
 /// = Panics
 ///
-/// If the function can not parse an URL from the given string
-/// with this URL as the base URL, a `ParseError` will be thrown.
+/// If the function can not parse an URL from the given string, a `ParseError` will be thrown.
 ///
 /// - input (str):
 /// -> str
@@ -205,8 +204,7 @@
 ///
 /// = Panics
 ///
-/// If the function can not parse an URL from the given string
-/// with this URL as the base URL, a `ParseError` will be thrown.
+/// If the function can not parse an URL from the given string, a `ParseError` will be thrown.
 ///
 /// - input (str):
 /// -> dict
@@ -423,8 +421,7 @@
 ///
 /// = Panics
 ///
-/// If the function can not parse an URL from the given string
-/// with this URL as the base URL, a `ParseError` will be thrown.
+/// If the function can not parse an URL from the given string, a `ParseError` will be thrown.
 ///
 /// - input (str):
 /// -> dict
@@ -483,7 +480,7 @@
 /// -> str
 #let join(base, url) = str(p.join(bytes(base), bytes(url)))
 
-/// Creates a relative URL if possible, with this URL as the base URL.
+/// Create a relative URL if possible, with this URL as the base URL.
 ///
 /// This is the inverse of `join`.
 ///
@@ -521,3 +518,71 @@
 /// - url (str):
 /// -> str
 #let make-relative(base, url) = cbor(p.make_relative(bytes(base), bytes(url)))
+
+/// Create a new URL with the query pairs changed.
+///
+/// The query pairs can be of three types:
+///
+/// - `array<(str, str)>`: An array of (key, value) pairs.
+///
+///   An empty array means no query pairs, but the `?` is still kept in the URL.
+///
+/// - `none`
+///
+///   No query pairs, and clear the `?` in the URL.
+///
+/// - `dict<str, str>`: A dictionary of key-value pairs.
+///
+///   A handy alternative format to `array<(str, str)>` when duplicate keys are not needed.
+///
+/// #example(`
+///   #assert.eq(
+///     with-query-pairs("https://example.com/products", (page: "2")),
+///     "https://example.com/products?page=2",
+///   )
+/// `)
+///
+/// #example(`
+///   #let old-url = "https://example.net?lang=fr#nav"
+///   #let old-query = parse-supplementary(old-url).query-pairs
+///   #let new-query = old-query + (foo: "bar").pairs()
+///   #let new-url = with-query-pairs(old-url, new-query)
+///   #assert.eq(new-url, "https://example.net/?lang=fr&foo=bar#nav")
+///   #assert.eq(parse(new-url).query, "lang=fr&foo=bar")
+/// `)
+///
+/// #example(`
+///   #assert.eq(
+///     with-query-pairs("https://example.net/?lang=fr&foo=bar#nav", (
+///       ("foo", "bar & baz"),
+///       ("saisons", "\u{00C9}t\u{00E9}+hiver"),
+///     )),
+///     "https://example.net/?foo=bar+%26+baz&saisons=%C3%89t%C3%A9%2Bhiver#nav",
+///   )
+/// `)
+/// #example(`
+///   #assert.eq(
+///     with-query-pairs("https://example.net/?lang=fr&foo=bar#nav", none),
+///     "https://example.net/#nav",
+///   )
+///   #assert.eq(
+///     with-query-pairs("https://example.net/?lang=fr&foo=bar#nav", (lang: "en")),
+///     "https://example.net/?lang=en#nav",
+///   )
+/// `)
+///
+/// See also #link("https://docs.rs/url/latest/url/struct.Url.html#method.query_pairs_mut")[`Url::query_pairs_mut`] in rust docs.
+///
+/// = Panics
+///
+/// If the function can not parse an URL from `url`, a `ParseError` will be thrown.
+///
+/// If the format of `query` is invalid (e.g., a value is not a string), an error will be thrown.
+///
+/// - url (str): the original URL
+/// - query (`none | array<(str, str)> | dict<str, str>`): the new query pairs
+/// -> str
+#let with-query-pairs(url, query) = {
+  let query = if type(query) == dictionary { query.pairs() } else { query }
+  str(p.with_query_pairs(bytes(url), cbor.encode(query)))
+}
