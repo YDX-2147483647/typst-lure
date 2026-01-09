@@ -2,12 +2,14 @@
 
 Parse and normalize URLs, based on the [WHATWG URL Standard](https://url.spec.whatwg.org/), powered by [rust-url](https://crates.io/crates/url) and [WebAssembly](https://typst.app/docs/reference/foundations/plugin/).
 
+For convenience, this package also provides several functions to create URLs from existing ones.
+
 ## Example usages
 
 ### Normalize URLs
 
 ```typst
-#import "@preview/lure:0.1.0": normalize
+#import "@preview/lure:0.2.0": normalize
 #normalize("https://ja.wikipedia.org/wiki/アルベルト・アインシュタイン")
 // ⇒ https://ja.wikipedia.org/wiki/%E3%82%A2%E3%83%AB%E3%83%99%E3%83%AB%E3%83%88%E3%83%BB%E3%82%A2%E3%82%A4%E3%83%B3%E3%82%B7%E3%83%A5%E3%82%BF%E3%82%A4%E3%83%B3
 ```
@@ -16,7 +18,7 @@ As the following example, you can create a wrapper of [`link`](https://typst.app
 before the official Typst compiler fixes [#6128](https://github.com/typst/typst/issues/6128).
 
 ```typst
-#import "@preview/lure:0.1.0": normalize
+#import "@preview/lure:0.2.0": normalize
 #let link(dest, ..body) = {
   assert.eq(body.named(), (:))
   assert(body.pos().len() <= 1)
@@ -36,7 +38,7 @@ Unlike [percencode](https://typst.app/universe/package/percencode), this package
 ### Convert between absolute and relative URLs
 
 ```typst
-#import "@preview/lure:0.1.0": join, make-relative
+#import "@preview/lure:0.2.0": join, make-relative
 
 #let base = "https://owner.github.io/repo/"
 
@@ -50,7 +52,7 @@ Unlike [percencode](https://typst.app/universe/package/percencode), this package
 ### Parse URLs
 
 ```typst
-#import "@preview/lure:0.1.0": parse, parse-supplementary
+#import "@preview/lure:0.2.0": parse, parse-supplementary
 
 // Parse into components
 #assert.eq(
@@ -88,7 +90,7 @@ URLs can be tricky. Please refer to the documentation (hover docs for typst func
 ### Change query pairs
 
 ```typst
-#import "@preview/lure:0.1.0": parse-supplementary, with-query-pairs
+#import "@preview/lure:0.2.0": parse-supplementary, with-query-pairs
 
 // Add search parameters to a URL
 #assert.eq(
@@ -115,9 +117,11 @@ URLs can be tricky. Please refer to the documentation (hover docs for typst func
 
 ## Changelog
 
-### [unreleased]
+### 0.2.0
 
 Add `with-query-pairs(url, query)` function.
+
+Bump rust-url to 2.5.8.
 
 ### 0.1.0
 
