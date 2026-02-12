@@ -34,7 +34,7 @@ jobs:
         with:
           repository: typst/packages
           token: ${{ secrets.REGISTRY_TOKEN }}
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v7
         with:
           name: package
       - name: Prepare files
