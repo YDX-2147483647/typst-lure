@@ -21,7 +21,7 @@ jobs:
       - run: just build
 
       - run: just package
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         with:
           name: package
           path: package.7z
