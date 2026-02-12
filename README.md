@@ -25,7 +25,7 @@ before the official Typst compiler fixes [#6128](https://github.com/typst/typst/
 
   std.link(
     normalize(dest),
-    body.pos().at(0, default: dest.replace(regex("^(mailto|tel)://"), "")),
+    body.pos().first(default: dest.replace(regex("^(mailto|tel)://"), "")),
   )
 }
 
