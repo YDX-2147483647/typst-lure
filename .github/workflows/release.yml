@@ -9,7 +9,7 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
-      - uses: typst-community/setup-typst@v4
+      - uses: typst-community/setup-typst@v5
       - uses: taiki-e/install-action@v2
         with:
           tool: just
