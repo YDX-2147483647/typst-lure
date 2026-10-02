@@ -18,8 +18,13 @@ jobs:
         with:
           tool: just,typship
       - name: Setup tinymist
-        run:
-          curl --proto '=https' --tlsv1.2 -LsSf https://github.com/Myriad-Dreamin/tinymist/releases/latest/download/tinymist-installer.sh | sh
+        shell: bash
+        run: |
+          set -euxo pipefail
+          curl --proto '=https' --tlsv1.2 -LsSf https://github.com/Myriad-Dreamin/tinymist/releases/download/${TINYMIST_VERSION}/tinymist-installer.sh | sh
+          tinymist --version
+        env:
+          TINYMIST_VERSION: v0.15.4
 
       - uses: dtolnay/rust-toolchain@stable
       - run: just setup
